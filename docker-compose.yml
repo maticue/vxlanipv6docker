@@ -1,0 +1,30 @@
+version: '2.1'
+
+services:
+
+  h1:
+    image: alpine
+    container_name: H1 
+    command: sh -c "tail -F /var/log/syslog"
+    privileged: true
+    extra_hosts:
+      - "moodle.local:200.6.9.10"
+    networks: 
+      ext:
+        ipv4_address: 70.0.0.101
+        ipv6_address: 2001:db8:3::101
+
+
+networks:
+  #B. external interface. macvlan to connect outside with its own mac address. parent nic is enp0s3, same domain broadcast as main host nic configuration, but different subnet. host still has internet access.
+  ext:
+    driver: "macvlan"
+    driver_opts:
+      parent: br100
+    enable_ipv6: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 70.0.0.0/24
+        - subnet: 2001:db8:3::/64
+          gateway: 2001:db8:3::1
